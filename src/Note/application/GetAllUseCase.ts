@@ -1,5 +1,6 @@
 import signale from "signale";
 import { INoteRepository } from "../domain/repository/INoteRepository";
+import { IAuthService } from "../../share/services/IAuthService";
 
 export class GetAllUseCase {
 
@@ -9,7 +10,7 @@ export class GetAllUseCase {
         try {
             const notes = await this.noteRepository.getAll(userId)
             return notes
-        } catch (e) {
+        } catch (e: any) {
             signale.error(e.message)
             return null
         }
