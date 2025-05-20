@@ -9,6 +9,7 @@ pipeline {
         EC2_QA_IP = "184.73.177.137"
         REMOTE_PATH = '/home/ubuntu/pratica_microservicios-1'
         SSH_KEY = credentials('ssh-key-ec2')
+        GIT_URL = "https://github.com/rodrigoFM17/pratica_microservicios-1.git"
     }
 
     stages {
@@ -76,8 +77,14 @@ pipeline {
 
                     sh """
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
+                        if [ -d "$REMOTE_PATH/.git" ]; then
+                            echo "Repositorio ya clonado. Haciendo pull..."
+                            cd $REMOTE_PATH && git pull origin ${branch}
+                        else
+                            echo "Clonando repositorio..."
+                            git clone -b ${branch} $GIT_URL $REMOTE_PATH
+                        fi && 
                         cd $REMOTE_PATH &&
-                        git pull origin ${branch} &&   
                         npm ci &&
                         pm2 restart registerApi || pm2 start "npm run dev" --name registerApi
                     '
