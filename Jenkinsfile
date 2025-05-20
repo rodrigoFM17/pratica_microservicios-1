@@ -7,7 +7,7 @@ pipeline {
         EC2_MAIN_IP = '44.205.149.189'
         EC2_DEV_IP = "54.90.179.128"
         EC2_QA_IP = "184.73.177.137"
-        REMOTE_PATH = '/home/ubuntu/jenkins-practica-1'
+        REMOTE_PATH = '/home/ubuntu/pratica_microservicios-1'
         SSH_KEY = credentials('ssh-key-ec2')
     }
 
