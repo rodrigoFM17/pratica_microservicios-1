@@ -72,17 +72,19 @@ pipeline {
                         error("no hay un servidor para esta rama ${branch}")
                     }
 
-                    configFileProvider([configFile(fileId: 'env-practica-1', targetLocation: '.env')]) {
-                        sh """
-                        scp -i $SSH_KEY -o StrictHostKeyChecking=no .env $EC2_USER@${ip}:$REMOTE_PATH/.env
+                    sh """
+                        
+
                         ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
                             cd $REMOTE_PATH &&
                             git pull origin ${branch} &&   
                             npm ci &&
                             pm2 restart health-api || pm2 start server.js --name health-api
                         '
+
                         """ 
-                    }
+
+                    
 
                     
                 }    
