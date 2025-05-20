@@ -22,6 +22,7 @@ pipeline {
             steps {
                 sh 'rm -rf node_modules'
                 sh 'npm ci'
+                sh "pwd"
             }
         }
 
@@ -75,11 +76,11 @@ pipeline {
                     sh """
                         
 
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip'
                             cd $REMOTE_PATH &&
                             git pull origin ${branch} &&   
                             npm ci &&
-                            pm2 restart health-api || pm2 start server.js --name health-api
+                            pm2 restart register-api || pm2 start "npm run dev" --name register-api
                         '
 
                         """ 
