@@ -80,7 +80,7 @@ pipeline {
                             cd $REMOTE_PATH &&
                             git pull origin ${branch} &&   
                             npm ci &&
-                            pm2 restart register-api || pm2 start "npm run dev" --name register-api
+                            pm2 restart registerApi || pm2 start "npm run dev" --name registerApi
                         '
 
                         """ 
