@@ -73,8 +73,9 @@ pipeline {
                         error("no hay un servidor para esta rama ${branch}")
                     }
 
+
                     sh """
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${ip}'
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
                         cd $REMOTE_PATH &&
                         git pull origin ${branch} &&   
                         npm ci &&
