@@ -74,16 +74,13 @@ pipeline {
                     }
 
                     sh """
-                        
-
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip'
-                            cd $REMOTE_PATH &&
-                            git pull origin ${branch} &&   
-                            npm ci &&
-                            pm2 restart registerApi || pm2 start "npm run dev" --name registerApi
-                        '
-
-                        """ 
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${ip}'
+                        cd $REMOTE_PATH &&
+                        git pull origin ${branch} &&   
+                        npm ci &&
+                        pm2 restart registerApi || pm2 start "npm run dev" --name registerApi
+                    '
+                    """ 
 
                     
 
