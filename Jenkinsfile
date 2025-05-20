@@ -28,17 +28,24 @@ pipeline {
         stage('Setup Servers') {
             steps {
                 script {
-                    def servers = [
-                        [ip: EC2_MAIN_IP, branch: 'main'],
-                        [ip: EC2_DEV_IP,  branch: 'dev'],
-                        [ip: EC2_QA_IP,   branch: 'qa']
-                    ]
+                    def branch = env.GIT_BRANCH.replaceAll('origin/', '')
+                    echo branch
+                    def ip = ""
+                    if(branch == "master"){
+                        ip = env.EC2_MAIN_IP
+                    } else if(branch == "dev"){
+                        ip = env.EC2_DEV_IP
+                    } else if(branch == "qa") {
+                        ip = env.EC2_QA_IP
+                    } else {
+                        error("no hay un servidor para esta rama ${branch}")
+                    }
 
                     for (server in servers) {
-                        echo "Configuring ${server.ip}..."
+                        echo "Configuring ${ip}..."
 
                         sh """
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${server.ip} '
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${ip} '
                             sudo apt-get update -y &&
                             sudo apt-get upgrade -y &&
                             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
@@ -57,7 +64,7 @@ pipeline {
                     def branch = env.GIT_BRANCH.replaceAll('origin/', '')
                     echo branch
                     def ip = ""
-                    if(branch == "main"){
+                    if(branch == "master"){
                         ip = env.EC2_MAIN_IP
                     } else if(branch == "dev"){
                         ip = env.EC2_DEV_IP
@@ -67,14 +74,19 @@ pipeline {
                         error("no hay un servidor para esta rama ${branch}")
                     }
 
-                    sh """
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
-                        cd $REMOTE_PATH &&
-                        git pull origin ${branch} &&   
-                        npm ci &&
-                        pm2 restart health-api || pm2 start server.js --name health-api
-                    '
-                    """
+                    configFileProvider([configFile(fileId: 'env-health-api', targetLocation: '.env')]) {
+                        sh """
+                        scp -i $SSH_KEY -o StrictHostKeyChecking=no .env $EC2_USER@${ip}:$REMOTE_PATH/.env
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
+                            cd $REMOTE_PATH &&
+                            git pull origin ${branch} &&   
+                            npm ci &&
+                            pm2 restart health-api || pm2 start server.js --name health-api
+                        '
+                        """ 
+                    }
+
+                    
                 }    
             }
         }
