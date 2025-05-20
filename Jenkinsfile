@@ -90,6 +90,12 @@ pipeline {
                     '
                     """ 
 
+                    configFileProvider([configFile(fileId: 'env-practica-1', targetLocation: '.env')]) {
+                        sh"""
+                        scp -i $SSH_KEY -o StrictHostKeyChecking=no .env $EC2_USER@${ip}:$REMOTE_PATH/.env
+                        """
+                    }
+
                     
 
                     
