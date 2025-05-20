@@ -41,19 +41,17 @@ pipeline {
                         error("no hay un servidor para esta rama ${branch}")
                     }
 
-                    for (server in servers) {
-                        echo "Configuring ${ip}..."
+                    echo "Configuring ${ip}..."
 
-                        sh """
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${ip} '
-                            sudo apt-get update -y &&
-                            sudo apt-get upgrade -y &&
-                            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
-                            sudo apt-get install -y nodejs &&
-                            sudo npm install -g pm2
-                        '
-                        """
-                    }
+                    sh """
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@${ip} '
+                        sudo apt-get update -y &&
+                        sudo apt-get upgrade -y &&
+                        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+                        sudo apt-get install -y nodejs &&
+                        sudo npm install -g pm2
+                    '
+                    """
                 }
             }
         }
@@ -74,7 +72,7 @@ pipeline {
                         error("no hay un servidor para esta rama ${branch}")
                     }
 
-                    configFileProvider([configFile(fileId: 'env-health-api', targetLocation: '.env')]) {
+                    configFileProvider([configFile(fileId: 'env-practica-1', targetLocation: '.env')]) {
                         sh """
                         scp -i $SSH_KEY -o StrictHostKeyChecking=no .env $EC2_USER@${ip}:$REMOTE_PATH/.env
                         ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_USER@$ip '
